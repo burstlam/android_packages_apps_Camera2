@@ -311,6 +311,7 @@ public class CameraSettings {
         ListPreference jpegQuality = group.findPreference(KEY_JPEG_QUALITY);
         ListPreference videoSnapSize = group.findPreference(KEY_VIDEO_SNAPSHOT_SIZE);
         ListPreference pictureFormat = group.findPreference(KEY_PICTURE_FORMAT);
+        ListPreference hfr = group.findPreference(KEY_VIDEO_HIGH_FRAME_RATE);
 
         if (!mParameters.isPowerModeSupported() && powerMode != null) {
             removePreference(group, powerMode.getKey());
@@ -392,6 +393,11 @@ public class CameraSettings {
         if (saturation != null && !CameraUtil.isSupported(mParameters, "saturation") &&
                 !CameraUtil.isSupported(mParameters, "max-saturation")) {
             removePreference(group, saturation.getKey());
+        }
+
+        if (hfr != null) {
+            filterUnsupportedOptions(group,
+                    hfr, mParameters.getSupportedVideoHighFrameRateModes());
         }
     }
 
@@ -908,6 +914,21 @@ public class CameraSettings {
 
     public static boolean isBeautyModeSupported(Parameters params) {
         return params.get("face-beautify") != null;
+    }
+
+    /**
+     * Enable video mode for certain cameras.
+     *
+     * @param params
+     * @param on
+     */
+    public static void setVideoMode(Parameters params, boolean on) {
+        if (CameraUtil.useSamsungCamMode()) {
+            params.set("cam_mode", on ? "1" : "0");
+        }
+        if (CameraUtil.useHTCCamMode()) {
+            params.set("cam-mode", on ? "1" : "0");
+        }
     }
 
     public static List<String> getSupportedSlowShutter(Parameters params) {
